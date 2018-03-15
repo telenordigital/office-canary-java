@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+option java_package = "com.telenordigital.officecanary";
+option java_outer_classname = "OfficeCanaryProto";
+
+package office_canary;
+
+import "google/protobuf/timestamp.proto";
+
+service OfficeCanary {
+    rpc GetPublicDevice(GetPublicDeviceRequest) returns (GetPublicDeviceResponse) {}
+
+    rpc GetPublicDatapoints(GetPublicDatapointsRequest) returns (GetPublicDatapointsResponse) {}
+}
+
+message GetPublicDeviceRequest {
+    string eui = 1;
+}
+message GetPublicDeviceResponse {
+    PublicDevice device = 1;
+}
+
+message GetPublicDatapointsRequest {
+    string eui = 1;
+}
+
+message GetPublicDatapointsResponse {
+    repeated PublicDatapoint datapoints = 1;
+}
+
+message PublicDevice {
+    string eui = 1;
+    string name = 2;
+}
+
+message PublicDatapoint {
+    google.protobuf.Timestamp timestamp = 1;
+    uint32 co2_ppm = 2;
+}
+
+message Datapoint {
+    string app_eui = 4;
+    string gateway_eui = 5;
+    string data_rate = 6;
+    string dev_addr = 7;
+    double frequency = 8;
+    int32 rssi = 9;
+    double snr = 10;
+    bytes payload = 11;
+
+    uint32 co2_ppm = 12;
+    CO2Status co2_status = 13;
+    uint32 resistance = 14;
+
+    // Total Volatile Organic Compound equivalent in Parts Per Billion
+    uint32 tvoc_ppb = 15;
+}
+
+enum CO2Status {
+    OK = 0x00;
+    Busy = 0x01;
+    Runin = 0x10;
+    Error = 0x80;
+}

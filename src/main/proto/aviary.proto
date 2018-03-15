@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+option java_package = "com.telenordigital.aviary";
+option java_outer_classname = "AviaryProto";
+
+package aviary;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+service Aviary {
+	rpc GetLoggedInUser(GetLoggedInUserRequest) returns (GetLoggedInUserResponse) {}
+
+	rpc CreateDevice(CreateDeviceRequest) returns (CreateDeviceResponse) {}
+	rpc GetDevices(GetDevicesRequest) returns (GetDevicesResponse) {}
+	rpc GetDevice(GetDeviceRequest) returns (GetDeviceResponse) {}
+	rpc UpdateDevice(UpdateDeviceRequest) returns (UpdateDeviceResponse) {}
+	rpc DeleteDevice(DeleteDeviceRequest) returns (DeleteDeviceResponse) {}
+
+	rpc GetDatapoints(GetDatapointsRequest) returns (GetDatapointsResponse) {}
+
+	// StreamDatapoints streams datapoints for the given device EUI; or if no EUI is given, for all the user's devices.
+	rpc StreamDatapoints(StreamDatapointsRequest) returns (stream StreamDatapointsResponse) {}
+}
+
+message SessionToken {
+	Claims claims = 1;
+	bytes mac = 2;
+
+	message Claims {
+		google.protobuf.Timestamp created = 1;
+		int64 user_id = 2;
+	}
+}
+
+message GetLoggedInUserRequest {}
+message GetLoggedInUserResponse {}
+
+message CreateDeviceRequest {
+	Device device = 1;
+}
+message CreateDeviceResponse {
+	Device device = 1;
+}
+
+message GetDevicesRequest {}
+message GetDevicesResponse {
+	repeated Device devices = 1;
+}
+
+message GetDeviceRequest {
+	string eui = 1;
+}
+message GetDeviceResponse {
+	Device device = 1;
+}
+
+message UpdateDeviceRequest {
+	Device device = 1;
+}
+message UpdateDeviceResponse {
+	Device device = 1;
+}
+
+message DeleteDeviceRequest {
+	string eui = 1;
+}
+message DeleteDeviceResponse {}
+
+message GetDatapointsRequest {
+	string eui = 1;
+	google.protobuf.Timestamp since = 2;
+	google.protobuf.Timestamp until = 3;
+}
+message GetDatapointsResponse {
+	repeated Datapoint datapoints = 1;
+}
+
+message StreamDatapointsRequest {
+	string device_eui = 1;
+}
+message StreamDatapointsResponse {
+	Datapoint datapoint = 1;
+}
+
+message Device {
+	string eui = 1;
+	string name = 2;
+	google.protobuf.DoubleValue latitude = 3;
+	google.protobuf.DoubleValue longitude = 4;
+	string connectivity_type = 5;
+	google.protobuf.Any connectivity_config = 6;
+	google.protobuf.Timestamp last_heard_from = 7;
+	string firmware_version = 8;
+}
+
+message LoRaDeviceConfig {
+	string eui = 1;
+	LoRaDeviceType device_type = 2;
+	string application_eui = 3;
+	string application_key = 4;
+	string device_address = 5;
+	string application_session_key = 6;
+	string network_session_key = 7;
+	bool relaxed_counter = 8;
+}
+
+enum LoRaDeviceType {
+	None = 0;
+	ABP = 1;
+	OTAA = 2;
+}
+
+message Datapoint {
+    int64 id = 1;
+    string device_eui = 2;
+    google.protobuf.Timestamp timestamp = 3;
+
+    google.protobuf.Any value = 4;
+}
