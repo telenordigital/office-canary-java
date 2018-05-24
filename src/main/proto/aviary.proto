@@ -89,13 +89,15 @@ message Device {
 	string name = 2;
 	google.protobuf.DoubleValue latitude = 3;
 	google.protobuf.DoubleValue longitude = 4;
-	string connectivity_type = 5;
-	google.protobuf.Any connectivity_config = 6;
+	string type = 5;
+	oneof connectivity_config {
+		LoRaConnectivityConfig lora_connectivity_config = 6;
+	}
 	google.protobuf.Timestamp last_heard_from = 7;
-	string firmware_version = 8;
+	ImageVersion firmware_version = 8;
 }
 
-message LoRaDeviceConfig {
+message LoRaConnectivityConfig {
 	string eui = 1;
 	LoRaDeviceType device_type = 2;
 	string application_eui = 3;
@@ -116,6 +118,27 @@ message Datapoint {
     int64 id = 1;
     string device_eui = 2;
     google.protobuf.Timestamp timestamp = 3;
-
     google.protobuf.Any value = 4;
+}
+
+message LoRaDatapoint {
+    string app_eui = 1;
+    string gateway_eui = 2;
+    string data_rate = 3;
+    string dev_addr = 4;
+    double frequency = 5;
+    int32 rssi = 6;
+    double snr = 7;
+    bytes payload = 8;
+}
+
+message BootDatapoint {
+    ImageVersion firmware_version = 1;
+}
+
+message ImageVersion {
+    uint32 major = 1;
+    uint32 minor = 2;
+    uint32 revision = 3;
+    uint32 build_num = 4;
 }

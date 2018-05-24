@@ -11,6 +11,8 @@ service OfficeCanary {
     rpc GetPublicDevice(GetPublicDeviceRequest) returns (GetPublicDeviceResponse) {}
 
     rpc GetPublicDatapoints(GetPublicDatapointsRequest) returns (GetPublicDatapointsResponse) {}
+
+    rpc StreamPublicDatapoints(StreamPublicDatapointsRequest) returns (stream StreamPublicDatapointsResponse) {}
 }
 
 message GetPublicDeviceRequest {
@@ -23,9 +25,15 @@ message GetPublicDeviceResponse {
 message GetPublicDatapointsRequest {
     string eui = 1;
 }
-
 message GetPublicDatapointsResponse {
     repeated PublicDatapoint datapoints = 1;
+}
+
+message StreamPublicDatapointsRequest {
+    string device_eui = 1;
+}
+message StreamPublicDatapointsResponse {
+    PublicDatapoint datapoint = 1;
 }
 
 message PublicDevice {
@@ -38,22 +46,13 @@ message PublicDatapoint {
     uint32 co2_ppm = 2;
 }
 
-message Datapoint {
-    string app_eui = 4;
-    string gateway_eui = 5;
-    string data_rate = 6;
-    string dev_addr = 7;
-    double frequency = 8;
-    int32 rssi = 9;
-    double snr = 10;
-    bytes payload = 11;
-
-    uint32 co2_ppm = 12;
-    CO2Status co2_status = 13;
-    uint32 resistance = 14;
+message CO2Datapoint {
+    uint32 co2_ppm = 2;
+    CO2Status co2_status = 3;
+    uint32 resistance = 4;
 
     // Total Volatile Organic Compound equivalent in Parts Per Billion
-    uint32 tvoc_ppb = 15;
+    uint32 tvoc_ppb = 5;
 }
 
 enum CO2Status {

@@ -56,40 +56,51 @@ public class OfficeCanary {
 		public boolean hasNext() {
 			try {
 				return iter.hasNext();
-			} catch (io.grpc.StatusRuntimeException e) {
-				warn("error: {0}", e);
+			} catch (io.grpc.StatusRuntimeException x) {
+				warn("error: {0}", x);
 				return false;
 			}
 		}
 
 		public Datapoint next() {
-			AviaryProto.StreamDatapointsResponse resp = iter.next();
-			AviaryProto.Datapoint dp = resp.getDatapoint();
+			AviaryProto.Datapoint dp = iter.next().getDatapoint();
 
-			Datapoint d = new Datapoint();
-			d.id = dp.getId();
-			d.deviceEUI = dp.getDeviceEui();
-			com.google.protobuf.Timestamp ts = dp.getTimestamp();
-			d.timestamp = java.time.Instant.ofEpochSecond(ts.getSeconds(), ts.getNanos());
+			long id = dp.getId();
+			String deviceEUI = dp.getDeviceEui();
+			com.google.protobuf.Timestamp tsp = dp.getTimestamp();
+			java.time.Instant timestamp = java.time.Instant.ofEpochSecond(tsp.getSeconds(), tsp.getNanos());
 
-			try {
-				OfficeCanaryProto.Datapoint dv = dp.getValue().unpack(OfficeCanaryProto.Datapoint.class);
-				d.appEUI = dv.getAppEui();
-				d.gatewayEUI = dv.getGatewayEui();
-				d.dataRate = dv.getDataRate();
-				d.devAddr = dv.getDevAddr();
-				d.frequency = dv.getFrequency();
-				d.rssi = dv.getRssi();
-				d.snr = dv.getSnr();
-				d.co2PPM = dv.getCo2Ppm();
-				d.co2Status = Datapoint.CO2Status.fromValue(dv.getCo2Status().getNumber());
-				d.resistance = dv.getResistance();
-				d.tvocPPB = dv.getTvocPpb();
-			} catch (com.google.protobuf.InvalidProtocolBufferException e) {
-				warn("error: {0}", e);
+			com.google.protobuf.Any v = dp.getValue();
+
+			if (v.is(AviaryProto.BootDatapoint.class)) {
+				try {
+					return BootDatapoint.fromProto(id, deviceEUI, timestamp, v.unpack(AviaryProto.BootDatapoint.class));
+				} catch (com.google.protobuf.InvalidProtocolBufferException x) {
+					warn("error: {0}", x);
+					return null;
+				}
 			}
 
-			return d;
+			if (v.is(AviaryProto.LoRaDatapoint.class)) {
+				try {
+					return LoRaDatapoint.fromProto(id, deviceEUI, timestamp, v.unpack(AviaryProto.LoRaDatapoint.class));
+				} catch (com.google.protobuf.InvalidProtocolBufferException x) {
+					warn("error: {0}", x);
+					return null;
+				}
+			}
+
+			if (v.is(OfficeCanaryProto.CO2Datapoint.class)) {
+				try {
+					return CO2Datapoint.fromProto(id, deviceEUI, timestamp, v.unpack(OfficeCanaryProto.CO2Datapoint.class));
+				} catch (com.google.protobuf.InvalidProtocolBufferException x) {
+					warn("error: {0}", x);
+					return null;
+				}
+			}
+
+			warn("unknown datapoint type: {0}", v.getTypeUrl());
+			return null;
 		}
 	}
 
