@@ -11,7 +11,7 @@ public class OfficeCanaryTest {
 	public void testStreamDatapoints() throws Exception {
 		OfficeCanary oc = new OfficeCanary("YOUR TOKEN GOES HERE");
 
-		OfficeCanary.DatapointStream stream = oc.streamDatapoints();
+		DatapointStream stream = oc.streamDatapoints();
 		while (stream.hasNext()) {
 			Datapoint d = stream.next();
 			if (d instanceof LoRaDatapoint) {
