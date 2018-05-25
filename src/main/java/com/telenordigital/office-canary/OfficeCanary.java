@@ -1,6 +1,5 @@
 package com.telenordigital.officecanary;
 
-import com.google.protobuf.Timestamp;
 import com.telenordigital.aviary.AviaryGrpc;
 import com.telenordigital.aviary.AviaryProto;
 import io.grpc.Metadata;
@@ -40,11 +39,27 @@ public class OfficeCanary {
 		channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
 	}
 
+	public Device[] getDevices() {
+		AviaryProto.GetDevicesRequest req = AviaryProto.GetDevicesRequest.newBuilder().build();
+		AviaryProto.GetDevicesResponse resp = stub.getDevices(req);
+
+		ArrayList<Device> devices = new ArrayList<Device>();
+		for (AviaryProto.Device d : resp.getDevicesList()) {
+			try {
+				devices.add(Device.fromProto(d));
+			} catch (com.google.protobuf.InvalidProtocolBufferException x) {
+				warn("error: {0}", x);
+			}
+		}
+
+		return devices.toArray(new Device[0]);
+	}
+
 	public Datapoint[] getDatapoints(String eui, Instant since, Instant until) {
 		AviaryProto.GetDatapointsRequest req = AviaryProto.GetDatapointsRequest.newBuilder()
 			.setEui(eui)
-			.setSince(instantToProto(since))
-			.setUntil(instantToProto(until))
+			.setSince(Proto.fromInstant(since))
+			.setUntil(Proto.fromInstant(until))
 			.build();
 		AviaryProto.GetDatapointsResponse resp = stub.getDatapoints(req);
 
@@ -63,10 +78,6 @@ public class OfficeCanary {
 	public DatapointStream streamDatapoints() {
 		AviaryProto.StreamDatapointsRequest req = AviaryProto.StreamDatapointsRequest.newBuilder().build();
 		return new DatapointStream(stub.streamDatapoints(req));
-	}
-
-	private static Timestamp instantToProto(Instant i) {
-		return Timestamp.newBuilder().setSeconds(i.getEpochSecond()).setNanos(i.getNano()).build();
 	}
 
 	private void warn(String msg, Object... params) {

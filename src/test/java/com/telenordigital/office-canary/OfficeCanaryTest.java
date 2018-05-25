@@ -11,6 +11,18 @@ public class OfficeCanaryTest {
 	private static final String apiToken = "YOUR TOKEN GOES HERE";
 
 	@Test
+	public void testGetDevices() throws Exception {
+		OfficeCanary oc = new OfficeCanary(apiToken);
+
+		Device[] devices = oc.getDevices();
+		for (Device d : devices) {
+			info("Got device {0}", d.eui);
+		}
+
+		oc.shutdown();
+	}
+
+	@Test
 	public void testGetDatapoints() throws Exception {
 		OfficeCanary oc = new OfficeCanary(apiToken);
 
