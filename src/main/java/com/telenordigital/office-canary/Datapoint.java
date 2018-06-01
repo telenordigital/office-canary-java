@@ -26,6 +26,10 @@ public interface Datapoint {
 			return CO2Datapoint.fromProto(id, deviceEUI, timestamp, v.unpack(OfficeCanaryProto.CO2Datapoint.class));
 		}
 
+		if (v.is(OfficeCanaryProto.ChipCap2Datapoint.class)) {
+			return ChipCap2Datapoint.fromProto(id, deviceEUI, timestamp, v.unpack(OfficeCanaryProto.ChipCap2Datapoint.class));
+		}
+
 		return null;
 	}
 }

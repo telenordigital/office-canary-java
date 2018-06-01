@@ -61,3 +61,9 @@ enum CO2Status {
     Runin = 0x10;
     Error = 0x80;
 }
+
+message ChipCap2Datapoint {
+    uint32 status = 1;
+    double temperature = 2;
+    double humidity = 3;
+}
