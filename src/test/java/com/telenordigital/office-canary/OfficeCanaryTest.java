@@ -55,6 +55,14 @@ public class OfficeCanaryTest {
 			CO2Datapoint co2 = (CO2Datapoint) d;
 			info("Got CO2 datapoint from device {0} with CO2 {1}", co2.deviceEUI, co2.co2PPM);
 		}
+		if (d instanceof ChipCap2Datapoint) {
+			ChipCap2Datapoint cc2 = (ChipCap2Datapoint) d;
+			info("Got ChipCap2 datapoint from device {0} with Temperature {1}", cc2.deviceEUI, cc2.temperature);
+		}
+		if (d instanceof PeopleCounterDatapoint) {
+			PeopleCounterDatapoint pc = (PeopleCounterDatapoint) d;
+			info("Got PeopleCounter datapoint from device {0} with count {1}", pc.deviceEUI, pc.count);
+		}
 		if (d == null) {
 			info("Got unknown datapoint (client should be updated)");
 		}

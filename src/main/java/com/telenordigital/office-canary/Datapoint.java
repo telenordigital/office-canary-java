@@ -30,6 +30,10 @@ public interface Datapoint {
 			return ChipCap2Datapoint.fromProto(id, deviceEUI, timestamp, v.unpack(OfficeCanaryProto.ChipCap2Datapoint.class));
 		}
 
+		if (v.is(OfficeCanaryProto.PeopleCounterDatapoint.class)) {
+			return PeopleCounterDatapoint.fromProto(id, deviceEUI, timestamp, v.unpack(OfficeCanaryProto.PeopleCounterDatapoint.class));
+		}
+
 		return null;
 	}
 }

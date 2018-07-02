@@ -67,3 +67,16 @@ message ChipCap2Datapoint {
     double temperature = 2;
     double humidity = 3;
 }
+
+message PeopleCounterDatapoint {
+    uint32 count = 1;
+}
+
+service PeopleCounter {
+    rpc ReportPeopleCount(ReportPeopleCountRequest) returns (ReportPeopleCountResponse) {}
+}
+
+message ReportPeopleCountRequest {
+    uint32 count = 1;
+}
+message ReportPeopleCountResponse {}
